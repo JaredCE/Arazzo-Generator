@@ -6,6 +6,9 @@ class ArazzoFile {
     constructor(openAPIFile) {
         this.openAPIFile = openAPIFile;
 
+        this.usedWorkflowIds = new Set();
+        this.usedStepIds = new Set();
+
         this.arazzo = {
             arazzo: '1.0.1',
         };
@@ -75,14 +78,40 @@ class ArazzoFile {
                     apiKeySchemes,
                     globalSecurity,
                     securitySchemes,
-                    pathName,  // Pass pathName
-                    method     // Pass method
+                    pathName,
+                    method
                 );
                 workflows.push(workflow);
             }
         }
 
         this.arazzo.workflows = workflows;
+    }
+
+    ensureUniqueWorkflowId(baseId) {
+        let workflowId = baseId;
+        let counter = 1;
+
+        while (this.usedWorkflowIds.has(workflowId)) {
+            workflowId = `${baseId}_${counter}`;
+            counter++;
+        }
+
+        this.usedWorkflowIds.add(workflowId);
+        return workflowId;
+    }
+
+    ensureUniqueStepId(baseId) {
+        let stepId = baseId;
+        let counter = 1;
+
+        while (this.usedStepIds.has(stepId)) {
+            stepId = `${baseId}_${counter}`;
+            counter++;
+        }
+
+        this.usedStepIds.add(stepId);
+        return stepId;
     }
 
     extractApiKeySchemes(securitySchemes) {
@@ -100,14 +129,18 @@ class ArazzoFile {
     }
 
     createWorkflow(operation, apiKeySchemes, globalSecurity, securitySchemes, pathName, method) {
+        // Generate workflowId
+        const baseWorkflowId = this.generateWorkflowId(method, pathName, operation.operationId);
+        const workflowId = this.ensureUniqueWorkflowId(baseWorkflowId);
+
         const workflow = {
+            workflowId,
             steps: [],
             inputs: {}
         };
 
-        const step = this.createBaseStep(operation, pathName, method);
+        const step = this.createBaseStep(operation, pathName, method, workflowId);
 
-        // ... rest of the method remains the same
         this.addRequestBody(workflow, step, operation);
         this.addRequiredParameters(workflow, step, operation);
 
@@ -122,15 +155,24 @@ class ArazzoFile {
         return workflow;
     }
 
-    createBaseStep(operation, pathName, method) {
-        const step = {};
+    createBaseStep(operation, pathName, method, workflowId) {
+        // Generate stepId (using workflowId as base for single-step workflows)
+        const baseStepId = workflowId; // or use generateStepIdWithPrefix for "step_" prefix
+        const stepId = this.ensureUniqueStepId(baseStepId);
+
+        const step = {
+            stepId
+        };
 
         if (operation.operationId) {
             step.operationId = operation.operationId;
         } else {
             // Generate JSON Pointer to the operation
-            const operationPointer = generateOperationPointer(pathName, method);
-            step.operationPath = `\${sourceDescriptions.${this.openAPIFile.name}.url}#${operationPointer}`;
+            const escapedPath = pathName
+                .replace(/~/g, '~0')
+                .replace(/\//g, '~1');
+
+            step.operationPath = `\${sourceDescriptions.${this.openAPIFile.name}.url}#/paths${escapedPath}/${method}`;
         }
 
         return step;
@@ -213,6 +255,44 @@ class ArazzoFile {
             .replace(/\//g, '~1');
 
         return `/paths${escapedPath}/${method}`;
+    }
+
+    generateWorkflowId(method, pathName, operationId = null) {
+        if (operationId) {
+            // Use operationId if available (might already be clean, but sanitize to be safe)
+            return this.sanitizeId(operationId);
+        }
+
+        // Generate from method and path: e.g., "get_users_id" for GET /users/{id}
+        const pathPart = pathName
+            .replace(/^\//, '')                 // Remove leading slash
+            .replace(/\{([^}]+)\}/g, '$1')      // Remove braces from path params: {id} -> id
+            .replace(/\//g, '_');               // Replace slashes with underscores
+
+        const workflowId = `${method}_${pathPart}`;
+        return this.sanitizeId(workflowId);
+    }
+
+    generateStepId(workflowId, stepIndex = 0) {
+        // Option 1: Just use the workflowId for single-step workflows
+        if (stepIndex === 0) {
+            return workflowId;
+        }
+
+        // Option 2: Add step index for multi-step workflows
+        return `${workflowId}_step_${stepIndex}`;
+    }
+
+    generateStepIdWithPrefix(method, pathName, operationId = null) {
+        const baseId = this.generateWorkflowId(method, pathName, operationId);
+        return `step_${baseId}`;
+    }
+
+    sanitizeId(str) {
+        return str
+            .replace(/[^A-Za-z0-9_\-]/g, '_')  // Replace invalid chars with underscore
+            .replace(/_{2,}/g, '_')             // Collapse multiple underscores
+            .replace(/^_+|_+$/g, '');           // Trim leading/trailing underscores
     }
 
     async writeFile() {
