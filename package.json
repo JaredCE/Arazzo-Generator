@@ -31,6 +31,8 @@
     "sinon": "^21.0.1"
   },
   "dependencies": {
-    "@redocly/openapi-core": "^2.15.0"
+    "@redocly/openapi-core": "^2.15.0",
+    "stream-chain": "^3.4.0",
+    "stream-json": "^1.9.1"
   }
 }

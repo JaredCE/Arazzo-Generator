@@ -221,4 +221,54 @@ describe(`OpenAPI File`, function () {
             }
         });
     });
+
+    describe(`streamTo`, function () {
+        it(`can stream to a security scheme`, async function () {
+            const openAPIPath = 'https://raw.githubusercontent.com/JaredCE/Arazzo-Runner/refs/heads/main/test/mocks/openapi/microservices/user.json'
+            const openAPIFile = new OpenAPIFile(openAPIPath);
+            openAPIFile.openAPILocation = `${path.resolve(__dirname, '../../..')}/Arazzo-Generator/test/mocks/openapi/bundled/user.json`;
+
+            try {
+                const expected = await openAPIFile.streamToSecurityScheme()
+                expect(expected).to.be.eql({
+                    "Authorization": {
+                        "type": "apiKey",
+                        "name": "Authorization",
+                        "in": "header"
+                    }
+                })
+            } catch (err) {
+                console.error(err)
+                expect(err).to.not.be.instanceOf(Error);
+            }
+        });
+
+        it(`can stream to the info`, async function () {
+            const openAPIPath = 'https://raw.githubusercontent.com/JaredCE/Arazzo-Runner/refs/heads/main/test/mocks/openapi/microservices/user.json'
+            const openAPIFile = new OpenAPIFile(openAPIPath);
+            openAPIFile.openAPILocation = `${path.resolve(__dirname, '../../..')}/Arazzo-Generator/test/mocks/openapi/bundled/user.json`;
+
+            try {
+                const expected = await openAPIFile.streamToInfo()
+
+                expect(expected).to.be.eql({
+                    "title": "Petstore User",
+                    "description": "This is a sample server Petstore server.  You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).  For this sample, you can use the api key `special-key` to test the authorization filters.\n",
+                    "version": "1.0.0",
+                    "termsOfService": "http://swagger.io/terms/",
+                    "contact": {
+                        "name": "",
+                        "email": "apiteam@swagger.io"
+                    },
+                    "license": {
+                        "name": "Apache 2.0",
+                        "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+                    }
+                })
+            } catch (err) {
+                console.error(err)
+                expect(err).to.not.be.instanceOf(Error);
+            }
+        });
+    });
 });

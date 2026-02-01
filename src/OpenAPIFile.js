@@ -5,8 +5,14 @@ const {
     bundleFromString,
     createConfig,
 } = require("@redocly/openapi-core");
+const { chain } = require("stream-chain");
+const { parser } = require('stream-json');
+const { pick } = require('stream-json/filters/Pick');
+const { streamObject } = require('stream-json/streamers/StreamObject');
+const { streamValues } = require("stream-json/streamers/StreamValues");
 
-const fs = require('node:fs/promises');
+const fs = require('node:fs');
+const fsp = require('node:fs/promises');
 const path = require('node:path');
 
 class OpenAPIFile {
@@ -40,12 +46,12 @@ class OpenAPIFile {
     }
 
     async writeOpenAPIDocument(data) {
-        await fs.writeFile(this.filePath, JSON.stringify(data, null, 2), 'utf8');
+        await fsp.writeFile(this.filePath, JSON.stringify(data, null, 2), 'utf8');
         this.openAPILocation = this.filePath;
     }
 
     async bundleDocument() {
-        const data = await fs.readFile(this.filePath)
+        const data = await fsp.readFile(this.filePath)
         const config = await createConfig({});
         const bundledData = await bundleFromString({
             source: data.toString(),
@@ -55,6 +61,60 @@ class OpenAPIFile {
         const document = bundledData.bundle.parsed;
 
         await this.writeOpenAPIDocument(document)
+    }
+
+    async streamToValue(filter) {
+        let pipeline;
+
+        pipeline = chain([
+            fs.createReadStream(path.resolve(this.openAPILocation)),
+            parser(),
+            pick({ filter: filter }),
+            streamValues(),
+        ]);
+
+        return pipeline
+    }
+
+    async streamToObject(filter) {
+        let pipeline;
+
+        pipeline = chain([
+            fs.createReadStream(path.resolve(this.openAPILocation)),
+            parser(),
+            pick({ filter: filter }),
+            streamObject(),
+        ]);
+
+        return pipeline
+    }
+
+    async streamToSecurityScheme() {
+        const pipeline = await this.streamToValue('components.securitySchemes');
+
+        let security;
+
+        for await (const { value } of pipeline) {
+            security = value;
+        }
+
+        return security
+    }
+
+    async streamToInfo() {
+        const pipeline = await this.streamToValue('info');
+
+        let info;
+
+        for await (const { value } of pipeline) {
+            info = value;
+        }
+
+        return info
+    }
+
+    async streamToPaths() {
+        return await this.streamToValue('paths');
     }
 
     isUrl() {
