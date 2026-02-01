@@ -70,5 +70,25 @@ describe(`Arazzo File`, function () {
                 expect(err).to.not.be.instanceOf(Error);
             }
         });
+
+        describe(`workflows`, function () {
+            it(`generates the expected workflows`, async function () {
+                const openAPIPath = 'https://example.com/openAPI.json'
+                const openAPIFile = new OpenAPIFile(openAPIPath);
+                openAPIFile.openAPILocation = `${path.resolve(__dirname, '../../..')}/Arazzo-Generator/test/mocks/openapi/bundled/user.json`;
+                openAPIFile.name = 'openAPI';
+
+                const arazzoFile = new ArazzoFile(openAPIFile);
+
+                try {
+                    await arazzoFile.generate();
+
+                    expect(arazzoFile.arazzo).to.have.property('workflows');
+                } catch (err) {
+                    console.error(err);
+                    expect(err).to.not.be.instanceOf(Error);
+                }
+            });
+        });
     });
 });
