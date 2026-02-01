@@ -45,5 +45,30 @@ describe(`Arazzo File`, function () {
                 expect(err).to.not.be.instanceOf(Error);
             }
         });
+
+        it(`generates a sourceDescriptions array from an OpenAPI Document`, async function () {
+            const openAPIPath = 'https://example.com/openAPI.json'
+            const openAPIFile = new OpenAPIFile(openAPIPath);
+            openAPIFile.openAPILocation = `${path.resolve(__dirname, '../../..')}/Arazzo-Generator/test/mocks/openapi/bundled/user.json`;
+            openAPIFile.name = 'openAPI';
+
+            const arazzoFile = new ArazzoFile(openAPIFile);
+
+            try {
+                await arazzoFile.generate();
+
+                expect(arazzoFile.arazzo).to.have.property('sourceDescriptions');
+                expect(arazzoFile.arazzo.sourceDescriptions).to.be.an('array');
+                expect(arazzoFile.arazzo.sourceDescriptions).to.have.lengthOf(1);
+                expect(arazzoFile.arazzo.sourceDescriptions[0]).to.be.eql({
+                    url: openAPIPath,
+                    type: 'openapi',
+                    name: 'openAPI'
+                })
+            } catch (err) {
+                console.error(err);
+                expect(err).to.not.be.instanceOf(Error);
+            }
+        });
     });
 });
