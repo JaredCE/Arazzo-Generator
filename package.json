@@ -4,7 +4,8 @@
   "description": "Generates Arazzo Workflow Documents from your OpenAPI Documents",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "test": "mocha --config './test/.mocharc.js'",
+    "prepare": "husky"
   },
   "repository": {
     "type": "git",
@@ -20,5 +21,12 @@
   "bugs": {
     "url": "https://github.com/JaredCE/Arazzo-Generator/issues"
   },
-  "homepage": "https://github.com/JaredCE/Arazzo-Generator#readme"
+  "homepage": "https://github.com/JaredCE/Arazzo-Generator#readme",
+  "devDependencies": {
+    "chai": "^6.2.2",
+    "husky": "^9.1.7",
+    "mocha": "^11.7.5",
+    "nock": "^14.0.10",
+    "nyc": "^17.1.0"
+  }
 }
