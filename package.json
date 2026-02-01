@@ -1,0 +1,24 @@
+{
+  "name": "arazzo-generator",
+  "version": "0.0.1",
+  "description": "Generates Arazzo Workflow Documents from your OpenAPI Documents",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JaredCE/Arazzo-Generator.git"
+  },
+  "keywords": [
+    "Arazzo",
+    "OpenAPI",
+    "Workflows"
+  ],
+  "author": "Jared Evans",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JaredCE/Arazzo-Generator/issues"
+  },
+  "homepage": "https://github.com/JaredCE/Arazzo-Generator#readme"
+}
