@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha --config './test/.mocharc.js'",
+    "test-specific": "mocha --config './test/.mocharc.js' --grep 'generates the expected workflows'",
     "prepare": "husky"
   },
   "repository": {
