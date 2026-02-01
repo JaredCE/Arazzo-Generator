@@ -11,6 +11,8 @@ class ArazzoFile {
 
     async generate() {
         await this.generateInfo();
+
+        await this.generateSourceDescription();
     }
 
     async generateInfo() {
@@ -38,6 +40,16 @@ class ArazzoFile {
         }
 
         Object.assign(this.arazzo, { info: obj })
+    }
+
+    async generateSourceDescription() {
+        const obj = {
+            url: this.openAPIFile.openAPIPath,
+            type: 'openapi',
+            name: this.openAPIFile.name
+        }
+
+        this.arazzo.sourceDescriptions = [obj];
     }
 }
 
