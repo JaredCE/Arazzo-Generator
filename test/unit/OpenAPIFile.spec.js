@@ -4,6 +4,8 @@ const expect = require("chai").expect;
 const nock = require("nock");
 const sinon = require('sinon');
 
+const path = require('node:path')
+
 const OpenAPIFile = require('../../src/OpenAPIFile')
 
 describe(`OpenAPI File`, function () {
@@ -57,7 +59,7 @@ describe(`OpenAPI File`, function () {
                 await openAPIFile.getAndBundle();
 
                 expect(openAPIFile).to.have.property('openAPILocation');
-                expect(openAPIFile.openAPILocation).to.be.equal('/Users/jaredevans/Projects/GitHub/Personal/Arazzo-Generator/user.json')
+                expect(openAPIFile.openAPILocation).to.be.equal(`${path.resolve(__dirname, '../../..')}/Arazzo-Generator/user.json`)
             } catch (err) {
                 console.error(err);
                 expect(err).to.not.be.instanceOf(Error);
