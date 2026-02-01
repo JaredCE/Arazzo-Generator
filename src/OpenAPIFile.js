@@ -32,6 +32,7 @@ class OpenAPIFile {
         let headers = new Headers();
         let fetchURL = new URL(this.openAPIPath);
         const fileName = fetchURL.pathname.split('/').at(-1)
+        this.name = fileName.split('.').at(0);
         this.filePath = path.resolve('.', fileName);
 
         const response = await fetch(fetchURL, { headers });
