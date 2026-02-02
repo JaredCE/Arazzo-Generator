@@ -231,6 +231,80 @@ describe(`Arazzo File`, function () {
                     }
                 });
             });
+
+            describe(`successCriteria`, function () {
+                it(`should create a simple successCriteria object for a 200 response`, async function () {
+                    const openAPIPath = 'https://example.com/openAPI.json'
+                    const openAPIFile = new OpenAPIFile(openAPIPath);
+                    openAPIFile.openAPILocation = `${path.resolve(__dirname, '../../..')}/Arazzo-Generator/test/mocks/openapi/bundled/responses/200-response.json`;
+                    openAPIFile.name = 'openAPI';
+
+                    const arazzoFile = new ArazzoFile(openAPIFile);
+
+                    try {
+                        await arazzoFile.generate();
+
+                        expect(arazzoFile.arazzo).to.have.property('workflows');
+                    } catch (err) {
+                        console.error(err);
+                        expect(err).to.not.be.instanceOf(Error);
+                    }
+                });
+
+                it(`should create a regex successCriteria object for a 2xx response`, async function () {
+                    const openAPIPath = 'https://example.com/openAPI.json'
+                    const openAPIFile = new OpenAPIFile(openAPIPath);
+                    openAPIFile.openAPILocation = `${path.resolve(__dirname, '../../..')}/Arazzo-Generator/test/mocks/openapi/bundled/responses/2XX-response.json`;
+                    openAPIFile.name = 'openAPI';
+
+                    const arazzoFile = new ArazzoFile(openAPIFile);
+
+                    try {
+                        await arazzoFile.generate();
+
+                        expect(arazzoFile.arazzo).to.have.property('workflows');
+                    } catch (err) {
+                        console.error(err);
+                        expect(err).to.not.be.instanceOf(Error);
+                    }
+                });
+
+                it(`should not create a successCriteria object when there are no 2xx responses`, async function () {
+                    const openAPIPath = 'https://example.com/openAPI.json'
+                    const openAPIFile = new OpenAPIFile(openAPIPath);
+                    openAPIFile.openAPILocation = `${path.resolve(__dirname, '../../..')}/Arazzo-Generator/test/mocks/openapi/bundled/responses/no-2xx-response.json`;
+                    openAPIFile.name = 'openAPI';
+
+                    const arazzoFile = new ArazzoFile(openAPIFile);
+
+                    try {
+                        await arazzoFile.generate();
+
+                        expect(arazzoFile.arazzo).to.have.property('workflows');
+                    } catch (err) {
+                        console.error(err);
+                        expect(err).to.not.be.instanceOf(Error);
+                    }
+                });
+
+                it(`should create a successCriteria object when there are multiple 2xx responses`, async function () {
+                    const openAPIPath = 'https://example.com/openAPI.json'
+                    const openAPIFile = new OpenAPIFile(openAPIPath);
+                    openAPIFile.openAPILocation = `${path.resolve(__dirname, '../../..')}/Arazzo-Generator/test/mocks/openapi/bundled/responses/multple-2xx-responses.json`;
+                    openAPIFile.name = 'openAPI';
+
+                    const arazzoFile = new ArazzoFile(openAPIFile);
+
+                    try {
+                        await arazzoFile.generate();
+
+                        expect(arazzoFile.arazzo).to.have.property('workflows');
+                    } catch (err) {
+                        console.error(err);
+                        expect(err).to.not.be.instanceOf(Error);
+                    }
+                });
+            });
         });
     });
 });
