@@ -22,8 +22,11 @@ class OpenAPIFile {
 
     async getAndBundle() {
         if (this.isUrl()) {
+            this.downloaded = true;
             await this.fetchOpenAPIDocument();
-        } else { }
+        } else {
+            this.filePath = this.openAPIPath;
+        }
 
         await this.bundleDocument();
     }
@@ -47,7 +50,13 @@ class OpenAPIFile {
     }
 
     async writeOpenAPIDocument(data) {
-        await fsp.writeFile(this.filePath, JSON.stringify(data, null, 2), 'utf8');
+        if (this.downloaded) {
+            await fsp.writeFile(this.filePath, JSON.stringify(data, null, 2), 'utf8');
+        } else {
+            const fileName = 'bundled-openAPI.json'
+            this.filePath = path.resolve('.', fileName)
+            await fsp.writeFile(this.filePath, JSON.stringify(data, null, 2), 'utf8');
+        }
         this.openAPILocation = this.filePath;
     }
 

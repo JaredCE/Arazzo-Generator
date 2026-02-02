@@ -66,6 +66,20 @@ describe(`OpenAPI File`, function () {
             }
         });
 
+        it(`can read a local file`, async function () {
+            const openAPIFile = new OpenAPIFile('./test/mocks/openapi/user.json');
+
+            try {
+                await openAPIFile.getAndBundle();
+
+                expect(openAPIFile).to.have.property('openAPILocation');
+                expect(openAPIFile.openAPILocation).to.be.equal(`${path.resolve(__dirname, '../../..')}/Arazzo-Generator/bundled-openAPI.json`)
+            } catch (err) {
+                console.error(err);
+                expect(err).to.not.be.instanceOf(Error);
+            }
+        });
+
         it(`will error when trying to budle an OpenAPI Document`, async function () {
             nock('https://raw.githubusercontent.com:443', { "encodedQueryParams": true })
                 .get('/JaredCE/Arazzo-Runner/refs/heads/main/test/mocks/openapi/microservices/user.json')
