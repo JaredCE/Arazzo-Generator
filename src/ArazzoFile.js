@@ -147,6 +147,8 @@ class ArazzoFile {
         const securityToApply = operation.security || globalSecurity || [];
         this.addSecurityParameters(workflow, step, securityToApply, apiKeySchemes, securitySchemes);
 
+        this.addSuccessCriteria(workflow, step, operation);
+
         if (Object.keys(workflow.inputs).length === 0) {
             delete workflow.inputs;
         }
@@ -192,6 +194,37 @@ class ArazzoFile {
             contentType: primaryContentType,
             payload: '$inputs.requestBody'
         };
+    }
+
+    addSuccessCriteria(workflow, step, operation) {
+        const responses = operation.responses;
+
+        const responseCodes = Object.keys(responses);
+
+        const allTwoHundredCodes = responseCodes.filter(code => /2(\d\d|XX)/gi.test(code));
+        const twoHundredCodes = allTwoHundredCodes.filter(code => /2(\d\d)/gi.test(code));
+        const twoXXCodes = allTwoHundredCodes.filter(code => /2(XX)/gi.test(code));
+
+        const successCriteria = []
+        if (twoHundredCodes.length) {
+            let str = ''
+            for (let i = 0; i < twoHundredCodes.length; i++) {
+                if (i === 0) {
+                    str += `$statusCode == ${twoHundredCodes[i]}`;
+                } else {
+                    str += ` || $statusCode == ${twoHundredCodes[i]}`
+                }
+            }
+            successCriteria.push({ condition: str });
+        }
+
+        if (twoXXCodes.length) {
+            successCriteria.push({ condition: '^2(\\d\\d)$', context: '$statusCode', type: 'regex' })
+        }
+
+        if (successCriteria.length > 0) {
+            step.successCriteria = successCriteria;
+        }
     }
 
     addRequiredParameters(workflow, step, operation) {
