@@ -3,8 +3,9 @@
 const fs = require('node:fs/promises');
 
 class ArazzoFile {
-    constructor(openAPIFile) {
+    constructor(openAPIFile, outputFile = 'arazzo.json') {
         this.openAPIFile = openAPIFile;
+        this.outputFile = outputFile;
 
         this.usedWorkflowIds = new Set();
         this.usedStepIds = new Set();
@@ -329,7 +330,7 @@ class ArazzoFile {
     }
 
     async writeFile() {
-        await fs.writeFile('arazzo.json', JSON.stringify(this.arazzo))
+        await fs.writeFile(this.outputFile, JSON.stringify(this.arazzo))
     }
 }
 
