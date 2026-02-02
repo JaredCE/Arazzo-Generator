@@ -1,13 +1,14 @@
 {
   "name": "arazzo-generator",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Generates Arazzo Workflow Documents from your OpenAPI Documents",
   "main": "index.js",
   "scripts": {
     "test": "mocha --config './test/.mocharc.js'",
     "test-specific": "mocha --config './test/.mocharc.js' --grep 'generates workflows with global security and optional securtity at operation level'",
     "test-coverage": "nyc mocha --config './test/.mocharc.js'",
-    "prepare": "husky"
+    "prepare": "husky",
+    "start": "node cli.js"
   },
   "repository": {
     "type": "git",
@@ -18,6 +19,9 @@
     "OpenAPI",
     "Workflows"
   ],
+  "bin": {
+    "arazzo-generator": "cli.js"
+  },
   "author": "Jared Evans",
   "license": "MIT",
   "bugs": {
