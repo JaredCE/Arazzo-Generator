@@ -1,6 +1,6 @@
 {
   "name": "arazzo-generator",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Generates Arazzo Workflow Documents from your OpenAPI Documents",
   "main": "index.js",
   "scripts": {
