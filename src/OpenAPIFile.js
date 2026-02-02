@@ -102,6 +102,18 @@ class OpenAPIFile {
         return security
     }
 
+    async streamToSecurity() {
+        const pipeline = await this.streamToValue('security');
+
+        let security;
+
+        for await (const { value } of pipeline) {
+            security = value;
+        }
+
+        return security
+    }
+
     async streamToInfo() {
         const pipeline = await this.streamToValue('info');
 
@@ -115,7 +127,7 @@ class OpenAPIFile {
     }
 
     async streamToPaths() {
-        return await this.streamToValue('paths');
+        return await this.streamToObject('paths');
     }
 
     isUrl() {

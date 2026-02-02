@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha --config './test/.mocharc.js'",
+    "test-specific": "mocha --config './test/.mocharc.js' --grep 'generates workflows with global security and optional securtity at operation level'",
+    "test-coverage": "nyc mocha --config './test/.mocharc.js'",
     "prepare": "husky"
   },
   "repository": {
