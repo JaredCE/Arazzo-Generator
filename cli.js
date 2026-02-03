@@ -43,7 +43,6 @@ OPTIONS:
   -o, --output <file>        Path to output Arazzo Document JSON file (required)
   -h, --help                 Show this help message
   -v, --version              Show version number
-  --verbose                  Verbose Logging
 
 EXAMPLES:
   # Run with local files
@@ -125,7 +124,7 @@ async function main() {
 
   try {
     const generator = new Generator({ verbose: values?.verbose || false });
-    await generator.generate(openAPIPath);
+    await generator.generate(openAPIPath, values.output);
 
     console.log("");
     console.log("✓ Arazzo Generation execution completed successfully");

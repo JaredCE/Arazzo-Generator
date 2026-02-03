@@ -16,8 +16,9 @@ const fsp = require('node:fs/promises');
 const path = require('node:path');
 
 class OpenAPIFile {
-    constructor(openAPIPath) {
+    constructor(openAPIPath, config) {
         this.openAPIPath = openAPIPath;
+        this.config = config;
     }
 
     async getAndBundle() {
@@ -33,6 +34,15 @@ class OpenAPIFile {
 
     async fetchOpenAPIDocument() {
         let headers = new Headers();
+
+        if (this.config?.apiKey) {
+            if (this.config.apiKey.in === 'header') {
+                headers.append(this.config.apiKey.name, this.config.apiKey.value);
+            } else {
+                this.openAPIPath += `?${this.config.apiKey.name}=${this.config.apiKey.value}`
+            }
+        }
+
         let fetchURL = new URL(this.openAPIPath);
         const fileName = fetchURL.pathname.split('/').at(-1)
         this.name = fileName.split('.').at(0);
